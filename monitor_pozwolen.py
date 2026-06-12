@@ -17,8 +17,10 @@ from email.message import EmailMessage
 
 # ---- KONFIGURACJA (mozesz edytowac) ----
 DATA_URL = os.environ.get("SOURCE_URL", "")
-KEYWORDS = ["magazyn", "centrum logistyczn", "park logistyczn",
-            "centrum dystrybucyjn", "logistyczn"]
+KEYWORDS = ["hala magazyn", "magazynowo-logistyczn", "logistyczno-magazynow",
+            "magazynowo-produkcyjn", "produkcyjno-magazynow", "centrum magazynow",
+            "centrum logistyczn", "park logistyczn", "centrum dystrybucyjn",
+            "magazyn wysokiego"]
 EXCLUDE  = ["magazyn energii", "magazynu energii",
             "magazynow energii", "magazynów energii", "magazyny energii"]
 # ----------------------------------------
