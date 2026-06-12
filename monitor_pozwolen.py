@@ -31,6 +31,7 @@ def log(m): print(f"[{datetime.now():%H:%M:%S}] {m}", flush=True)
 
 def pobierz(source):
     """URL -> plik tymczasowy; lokalna sciezka -> bez zmian."""
+    source = source.strip().strip('"').strip("'").strip()  # usun spacje/cudzyslowy
     if not source.lower().startswith("http"):
         return source
     log(f"Pobieram: {source}")
@@ -118,11 +119,18 @@ def main():
 
     if nowe:
         os.makedirs(a.outdir, exist_ok=True)
-        plik = os.path.join(a.outdir, f"nowe_{datetime.now():%Y%m%d_%H%M}.csv")
-        kol = sorted({k for r in nowe for k in r})
-        with open(plik, "w", newline="", encoding="utf-8-sig") as f:
-            w = csv.DictWriter(f, fieldnames=kol); w.writeheader(); w.writerows(nowe)
-        log(f"Zapisano: {plik}")
+        # Zbiorczy plik dla Arkusza Google (formula IMPORTDATA). Plain UTF-8.
+        zbiorczy = os.path.join(a.outdir, "wszystkie.csv")
+        istniejace = []
+        if os.path.exists(zbiorczy):
+            with open(zbiorczy, encoding="utf-8") as f:
+                istniejace = list(csv.DictReader(f))
+        wszystkie = istniejace + nowe
+        kol = sorted({k for r in wszystkie for k in r})
+        with open(zbiorczy, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=kol, restval="", extrasaction="ignore")
+            w.writeheader(); w.writerows(wszystkie)
+        log(f"Zaktualizowano zbiorczy plik: {zbiorczy} (lacznie {len(wszystkie)})")
         for r in nowe[:15]:
             print("  - " + " | ".join(f"{k}={v}" for k, v in r.items()
                                       if k != "_id" and v)[:160])
