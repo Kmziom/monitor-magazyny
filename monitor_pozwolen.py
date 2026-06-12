@@ -20,7 +20,7 @@ from email.message import EmailMessage
 #   tylko 2026           ->  ROK_OD = 2026   i   ROK_DO = 2026
 #   tylko 2025           ->  ROK_OD = 2025   i   ROK_DO = 2025
 #   wszystko na stale    ->  ROK_OD = 2024   i   ROK_DO = 2030
-ROK_OD = 2023     # <-- ZMIEN: rok poczatkowy
+ROK_OD = 2016     # <-- ZMIEN: rok poczatkowy
 ROK_DO = 2025     # <-- ZMIEN: rok koncowy
 # ===========================================================================
 
