@@ -1,0 +1,50 @@
+name: Monitor pozwolen na budowe
+
+# Uruchamia sie automatycznie co poniedzialek o 6:00 (czas UTC).
+# Mozna tez odpalic recznie z zakladki "Actions".
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobierz repozytorium
+        uses: actions/checkout@v4
+
+      - name: Ustaw Pythona
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Uruchom monitor
+        env:
+          # Te wartosci dodajesz w: Settings -> Secrets and variables -> Actions
+          SOURCE_URL: ${{ secrets.SOURCE_URL }}   # link do pliku wojewodztwa (ZIP lub CSV)
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO:   ${{ secrets.MAIL_TO }}
+        # Jesli polskie znaki beda polamane, zmien na: python3 monitor_pozwolen.py --encoding cp1250
+        run: python3 monitor_pozwolen.py
+
+      - name: Zapisz historie i raporty (zeby pamietac, co juz widziano)
+        uses: actions/upload-artifact@v4
+        with:
+          name: wyniki
+          path: |
+            widziane.json
+            wyniki/
+
+      # Aby historia "widziane.json" przetrwala miedzy uruchomieniami,
+      # commitujemy ja z powrotem do repozytorium:
+      - name: Zapamietaj widziane wpisy
+        run: |
+          git config user.name "monitor-bot"
+          git config user.email "bot@example.com"
+          git add widziane.json wyniki/ 2>/dev/null || true
+          git commit -m "Aktualizacja: $(date +%F)" 2>/dev/null || echo "Brak zmian"
+          git push 2>/dev/null || echo "Brak zmian do wyslania"
